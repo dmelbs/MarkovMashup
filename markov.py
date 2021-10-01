@@ -12,6 +12,7 @@ class MarkovModel:
         """
         self.k = k
         ## TODO: Setup any other member variables that might be useful
+        self.grams = {}
     
     def load_file(self, filename):
         """
@@ -24,7 +25,7 @@ class MarkovModel:
             Path to file to load
         """
         fin = open(filename)
-        self.add_string(fin.read())
+        self.add_string1(fin.read())
         fin.close()
     
     def load_file_lines(self, filename):
@@ -41,7 +42,7 @@ class MarkovModel:
         for line in fin.readlines():
             line = line.rstrip()
             if len(line) > 0:
-                self.add_string(line)
+                self.add_string1(line)
         fin.close()
     
     def add_string(self, s):
@@ -54,33 +55,70 @@ class MarkovModel:
         firstChar = ' '
         containsKey = False
         charCount = 0
-        grams = {}
+        #grams = {}
         N = self.k
-        if (len(s) >= self.k ):
+        if ( len(s) >= self.k ):
+            print(len(s))
             for i in range (len(s1)-len(s)):
                 firstChar = s1[i + N]
                 gram = s1[i:N]
                 charCount = 0
-                containsKey = False
-                if (gram not in grams):
-                   grams[gram] = {}
+                #containsKey = False
+                if (gram not in self.grams):
+                   self.grams[gram] = {}
                    charCount = 1
-                   grams[gram][firstChar] = charCount
+                   self.grams[gram][firstChar] = charCount
                    containsKey = True
-                elif (firstChar in grams[gram] and gram in grams and containsKey == False):
-                    charCount = grams[gram].get(firstChar)
+                elif (firstChar in self.grams[gram] and gram in self.grams and containsKey == False):
+                    charCount = self.grams[gram].get(firstChar)
                     charCount += 1
-                    grams[gram][firstChar] = charCount
-                elif (gram in grams and firstChar not in grams[gram] and containsKey == False):
+                    self.grams[gram][firstChar] = charCount
+                elif (gram in self.grams and firstChar not in self.grams[gram] and containsKey == False):
                     charCount = 1
-                    grams[gram][firstChar] = charCount
-                elif(len(s)> N):
-                    pass
+                    self.grams[gram][firstChar] = charCount
+        else:
+            pass
                     
                 
             
-        print(grams)
-        return grams # This does nothing
+        print(self.grams)
+        return self.grams # This does nothing
+    
+    def add_string1(self, s):
+        s1 = s + s
+        firstChar = ' '
+        charCount = 0
+        for i in range(len(s1) - len(s)):
+            gramLength = i + self.k
+            gram = s1[i:self.k]
+            if (gram not in self.grams):
+                #self.grams[gram] = {}
+                gramCounts = {}
+                if(gramLength <= len(s)):
+                    firstChar = s1[gramLength]
+                    if(firstChar in gramCounts):
+                        charCount = self.gramCounts.get(firstChar)
+                        charCount += 1
+                        gramCounts[firstChar] = charCount
+                    else:
+                        gramCounts[firstChar] = 1
+                self.grams[gram] = gramCounts
+            else:
+                if gramLength <= len(s):
+                    firstChar = s1[gramLength]
+                    if (firstChar in self.grams[gram]):
+                        charCount = self.grams[gram][firstChar]
+                        charCount += 1
+                        self.grams[gram][firstChar] = charCount
+                    else:
+                        self.grams[gram][firstChar] = 1
+        
+        print(self.grams)
+        return self.grams
+                        
+                
+                
+            
     
     def get_log_probability(self, s):
         """
